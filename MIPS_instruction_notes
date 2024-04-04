@@ -1,0 +1,442 @@
+## Contents
+1. MIPS Overview
+2. R-Type Instructions
+3. I-Type Instructions
+4. J-Type Instructions
+5. Register Details
+6. Practice Question
+
+---
+## 1. MIPS Overview
+- 32 general purpose registers
+- ### MIPS General Purpose Registers
+	- `$register_name` (`$register_number`)
+	- `$zero` (`$0`): Always holds the constant 0.
+	- `$at` (`$1`): Reserved for the assembler.
+	- `$v0`-`$v1` (`$2`-`$3`): Function return values.
+	- `$a0`-`$a3` (`$4`-`$7`): Function arguments.
+	- `$t0`-`$t7` (`$8`-`$15`): Temporaries, not preserved across call.
+	- `$s0`-`$s7` (`$16`-`$23`): Saved registers, preserved across calls.
+	- `$t8`-`$t9` (`$24`-`$25`): More temporaries, not preserved across call.
+	- `$k0`-`$k1` (`$26`-`$27`): Reserved for the kernel.
+	- `$gp` (`$28`): Global pointer.
+	- `$sp` (`$29`): Stack pointer.
+	- `$fp` (`$30`): Frame pointer.
+	- `$ra` (`$31`): Return address.
+- ### MIPS Special Purpose Registers
+	- **PC (Program Counter):** Holds the address of the next instruction to be executed.
+	- **HI:** Holds the high-order 32 bits of the result of a multiplication or the quotient of a division.
+	- **LO:** Holds the low-order 32 bits of the result of a multiplication or the remainder of a division.
+
+---
+---
+## 2. R-Type Instructions - Register-Type
+Ex: `add $t0, $t1, $t2 
+ - `$t1 + $t2 --> $t0` : ADD the values in `$t1` and `$t2` and STORE them in `$t1`
+- Operations simply use the values within registers, rather than direct values
+- ### **Format**:
+	- Bare component example:
+		- `opcode rd, rs, rt, shamt, funct`
+	- With registers:
+		- `add $t0, $t1, $t2`
+			-  ADD contents of $t1 + $t2
+			- STORE result in $t0
+			-  Unused shamt (0)
+	- **Bit Layout:** `opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6)`
+- ### Components
+	- **Opcode**
+		- 6 bits
+		- instruction TYPE
+	- **rs**
+		- 5 bits
+		- SOURCE operand
+	- **rt**
+		- 5 bits
+		- 2nd SOURCE operand
+	- **rd**
+		- 5 bits
+		- DESTINATION operand
+	- **shamt**
+		- 5 bits
+		- SHIFT value amount (for shift operations, otherwise = 0)
+	- **funct**
+		- 6 bits
+		- Function code -> specific operation (i.e. `add`)
+- ### Operations
+	- **add $rd, $rs, $rt** 
+	    - Adds `$rs` and `$rt`, result in `$rd`.
+	    - **Example:** `add $s1, $s2, $s3`
+	-  **sub $rd, $rs, $rt**
+	    - Subtracts `$rt` from `$rs`, result in `$rd`.
+	    - **Example:** `sub $s1, $s2, $s3`
+	-  **and $rd, $rs, $rt**
+	    - Bitwise AND of `$rs` and `$rt`, result in `$rd`.
+	    - **Example:** `and $s1, $s2, $s3`
+	- **or $rd, $rs, $rt**
+	    - Bitwise OR of `$rs` and `$rt`, result in `$rd`.
+	    - **Example:** `or $s1, $s2, $s3`
+	- **slt $rd, $rs, $rt** 
+	    - Sets `$rd` to 1 if `$rs` < `$rt`, else 0.
+	    - **Example:** `slt $s1, $s2, $s3`
+	- **sll $rd, $rt, shamt**
+	    - Shifts `$rt` left logically by `shamt`, result in `$rd`.
+	    - **Example:** `sll $s1, $s2, 2`
+	- **srl $rd, $rt, shamt**
+	    - Shifts `$rt` right logically by `shamt`, result in `$rd`.
+	    - **Example:** `srl $s1, $s2, 2`
+	- **sltu $rd, $rs, $rt**
+		- Compares `$rs` and `$rt` as unsigned integers. If `$rs` is less than `$rt`, sets `$rd` to 1; otherwise, sets `$rd` to 0.
+		- **Example:** `sltu $t0, $t1, $t2`
+
+---
+
+## 3. I-Type Instructions - Immediate-Type
+Ex: `addi $t0, $t1, 10`  
+	 - `$t1 + 10 --> $t0` : add value in `$t1` + immediate value `10` and stores in `$t0` 
+- Same operations as with r-type, but also uses an immediate value rather than a value stored in a register
+- ### **Format**:
+	-  Bare component example:
+		- `opcode rs, rt, immediate`
+	- With registers:
+		- `addi $t0, $t1, 16`
+			- ADD contents of $t1 + immediate value
+			- STORE result in $t0
+	- **Bit Layout:** `opcode (6) | rs (5) | rt (5) | immediate (16)`
+- ### Components 
+	- Opcode
+		- 6 bits
+		- Operation type (i.e. `addi`)
+	- rs 
+		- 5 bits
+		- SOURCE operand
+	- rt
+		- 5 bits
+		- DESTINATION register
+	- Immediate
+		- 16 bits
+		- Constant value or offset
+- ### Operations
+	1. **addi $rt, $rs, immediate**
+	    - Adds immediate to `$rs`, result in `$rt`.
+	    - **Example:** `addi $s1, $s2, 10`
+	2. **andi $rt, $rs, immediate**
+	    - Bitwise AND of `$rs` and immediate, result in `$rt`.
+	    - **Example:** `andi $s1, $s2, 0xFF`
+	3. **ori $rt, $rs, immediate**
+	    - Bitwise OR of `$rs` and immediate, result in `$rt`.
+	    - **Example:** `ori $s1, $s2, 0xFF`
+	4. **`lw $rt, offset($rs)`**
+	    - Loads word from memory at address `$rs` + offset into `$rt`.
+	    - **Example:** `lw $s1, 100($s2)`
+	5. **`sw $rt, offset($rs)`**
+	    - Stores word in `$rt` into memory at address `$rs` + offset.
+	    - **Example:** `sw $s1, 100($s2)`
+	6. **beq $rs, $rt, offset**
+	    - Branches to instruction at PC + offset if `$rs` == `$rt`.
+	    - **Example:** `beq $s1, $s2, label`
+	7. **bne $rs, $rt, offset**
+	    - Branches to instruction at PC + offset if `$rs` != `$rt`.
+	    - **Example:** `bne $s1, $s2, label`
+
+---
+## 4. J-Type Instructions - Jump-Type 
+Ex: `j 0x00400024`
+	-  jump to `0x00400024`
+- Simply tells the program to jump to a target instruction's 26-bit address
+- ## Format
+	- Component example:
+		- `opcode 00000000000000000000000000`
+	- Register example:
+		- `j 0x00400024`
+	- **Bit Layout:** `opcode (6) | address (26)`
+- ## Components
+	- Opcode
+		- 6 bits 
+		- Specified type of jump operation
+	- Address
+		- 26 bits
+		- Target address for program to jump to
+
+- ## Operations
+	1. **j address**
+	    - Jumps to the instruction at the specified address.
+	    - **Example:** `j 0x00400024`
+	2. **jal address**
+	    - Jumps to the instruction at the specified address and saves return address in `$ra`.
+	    - **Example:** `jal 0x00400024`
+
+---
+## 5. Register Details
+
+### MIPS Register Numbers and Function Codes
+
+|Register Name|Number|
+|---|---|
+|`$zero`|0|
+|`$at`|1|
+|`$v0`|2|
+|`$v1`|3|
+|`$a0`|4|
+|`$a1`|5|
+|`$a2`|6|
+|`$a3`|7|
+|`$t0`|8|
+|`$t1`|9|
+|`$t2`|10|
+|`$t3`|11|
+|`$t4`|12|
+|`$t5`|13|
+|`$t6`|14|
+|`$t7`|15|
+|`$s0`|16|
+|`$s1`|17|
+|`$s2`|18|
+|`$s3`|19|
+|`$s4`|20|
+|`$s5`|21|
+|`$s6`|22|
+|`$s7`|23|
+|`$t8`|24|
+|`$t9`|25|
+|`$k0`|26|
+|`$k1`|27|
+|`$gp`|28|
+|`$sp`|29|
+|`$fp`|30|
+|`$ra`|31|
+### MIPS Instruction Opcodes and Function Codes
+
+| Instruction | Type   | Opcode/Function Code (hex) |
+| ----------- | ------ | -------------------------- |
+| `add`       | R-type | Function: 0x20             |
+| `addu`      | R-type | Function: 0x21             |
+| `sub`       | R-type | Function: 0x22             |
+| `subu`      | R-type | Function: 0x23             |
+| `and`       | R-type | Function: 0x24             |
+| `or`        | R-type | Function: 0x25             |
+| `xor`       | R-type | Function: 0x26             |
+| `nor`       | R-type | Function: 0x27             |
+| `slt`       | R-type | Function: 0x2A             |
+| `sltu`      | R-type | Function: 0x2B             |
+| `sll`       | R-type | Function: 0x00             |
+| `srl`       | R-type | Function: 0x02             |
+| `sra`       | R-type | Function: 0x03             |
+| `addi`      | I-type | Opcode: 0x08               |
+| `addiu`     | I-type | Opcode: 0x09               |
+| `andi`      | I-type | Opcode: 0x0C               |
+| `ori`       | I-type | Opcode: 0x0D               |
+| `xori`      | I-type | Opcode: 0x0E               |
+| `lw`        | I-type | Opcode: 0x23               |
+| `sw`        | I-type | Opcode: 0x2B               |
+| `beq`       | I-type | Opcode: 0x04               |
+| `bne`       | I-type | Opcode: 0x05               |
+| `slti`      | I-type | Opcode: 0x0A               |
+| `sltiu`     | I-type | Opcode: 0x0B               |
+| `lui`       | I-type | Opcode: 0x0F               |
+| `j`         | J-type | Opcode: 0x02               |
+| `jal`       | J-type | Opcode: 0x03               |
+
+### R-type Instructions
+- **Bit Layout:** `opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6)`
+
+| Component | Bit Positions | Length (bits) |
+| --------- | ------------- | ------------- |
+| Opcode    | 31-26         | 6             |
+| rs        | 25-21         | 5             |
+| rt        | 20-16         | 5             |
+| rd        | 15-11         | 5             |
+| shamt     | 10-6          | 5             |
+| funct     | 5-0           | 6             |
+
+---
+### I-type Instructions
+- **Bit Layout:** `opcode (6) | rs (5) | rt (5) | immediate (16)`
+
+| Component | Bit Positions | Length (bits) |
+| --------- | ------------- | ------------- |
+| Opcode    | 31-26         | 6             |
+| rs        | 25-21         | 5             |
+| rt        | 20-16         | 5             |
+| immediate | 15-0          | 16            |
+|           |               |               |
+
+---
+### J-type Instructions
+- **Bit Layout:** `opcode (6) | address (26)`
+
+|Component|Bit Positions|Length (bits)|
+|---|---|---|
+|Opcode|31-26|6|
+|address|25-0|26|
+
+---
+
+## 6. Using the Information
+- Converting the intructions to 32-bit hex
+- TWO (2) methods of doing so, the easier method:
+	1. Associate each component according to the instruction type
+		1. Opcode
+		2. Registers
+		3. shamt
+		4. funct
+	2. Reference the proper value for each
+		1. Register number, function code, etc.
+	3. a. CONVERT to binary
+	4. a. Concat the binary 
+	5. a. Convert the binary to hex
+	3. b. Place each component in the right position (shifting)
+
+---
+
+#### PRACTICE:
+**Example** - Creating a 32-bit hex representation of a given instruction using the above information:
+- Instruction: `sltu $t3, $fp, $a1` 
+- Task: Calculate the 32-bit hex representation of this instruction
+1. What type of instruction? 
+	- R-Rtype --> opcode = `0x00`
+	- R-Type Bit Layout: `opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6)`
+2. Map Registers:
+			- `$t3` --> `$rd` (destination)
+			- `$fp` --> `$rs` (source)
+			- `$a1` --> `$rt` (2nd source)
+3. Associate Register Numbers and Codes:
+		- **rd** (`$t3`) = 11
+		- **rs** (`$fp`) = 30
+		- **rt** (`$a1`) = 5
+		- **shamt:** unused - 0 
+		- **funct:** `sltu` = `0x2B` 
+4. Arrange:
+`opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6)`
+		- 32 bits 0x00000000
+		1. Opcode: 0x00
+		2. rs = 30 --> 0x1E
+		3. rt = 5 --> 0x05
+		4. rd = 11 --> 0x0B
+		5. shamt = 0 --> 0x00
+		6. funct = 0x2B
+5. 2 Options:	 
+	- a1. Convert to Binary	
+		- **opcode** = 000000
+		- **rs ($fp)** = `30` = `11110` 
+		- **rt ($a1)** = `5` = `00101` 
+		- **rd ($t3)** = `11` = `01011` 
+		- **shamt** = `0` = `00000` 
+		- **funct (sltu)** = `0x2B` = `101011`
+	- a2. Concatenate the Binary
+		- `000000 11110 00101 01011 00000 101011`
+	- a3. Convert back to Hex
+			- `0x3C5582B` = 32-bit hex instruction address
+	- b1.  Perform shift manually
+			- `value * shift` --> hex 
+				- Ex: `rs = 30`, `rs` is 21 bits left --> `30 * (2^21) = 62914560` --> convert 62914560 to hex --> 0x3C0000
+					- repeat, for the rest and obtain the full hex address
+	- b2. Concatenate each value
+- Summary:
+	- Know the opcode for the instruction type, the function code, and then associate each register with source/dest/etc to derive the register values. Take each of those register values, and convert them to binary. Once converted to binary, concatenate the binary, then convert it to hex and you have the 32-bit hex rep of the instruction. OR - instead of binary, you can take the register values and multiple them by 2 * the shift offset of that component for each of the register values, opcode, and func code. Do that for all of them, and convert to hex, then concatenate. 
+
+---
+Quiz:
+Q1. Instruction:
+`subu $ra, $t7, $s2`
+- opcode = 0x00 (r-type)
+- func code = 0x23 --> 35 --> 100011
+- $ra = rd =  31 --> 11111
+- $t7 = rs = 15 --> 01111
+- $s2 = rt = 18 --> 10010 
+`000000 01111 10010 11111 00000 100011` --> `1F2F823`
+
+Q2. Instruction: 
+`subu $s2, $v0, $s7`
+- rd - s2 = 18 = 10010
+- rs - v0 = 2 = 00010
+- rt - s7 = 23 = 10111
+- r-type - opcode = 0
+- func code = 0x23 = 35 = 100011 
+`00000000010101111001000000100011`
+
+Q3. Instruction:
+`sltu $t3, $fp, $a1`
+- rd - t3 = 11 = 01011
+- rs - fp = 30 = 11110
+- rt - a1 = 5 = 00101
+- opcode = 0x00
+- func code = 0x2B = 32 + 11 = 43 -> 101011
+`00000011110001010101100000101011
+
+Q4. Instruction:
+`sw $s5 16212($zero)`
+I TYPE --> opcode - rs - rt - immediate
+- rs = 0 = 00000
+- rt = $s5 = 21 = 10101
+- immediate = 16212 = 11111101010100
+- opcode = 0x2B = 43 = 101011
+101011000001010111111101010100
+
+---
+ORI Example question: 
+
+Given:
+
+- **$s0 = 29**
+- **Immediate Value = 14652**
+
+To find the result of `ori $v0, $s0, 14652`, we need to:
+
+1. Convert the decimal values to binary.
+2. Perform the bitwise OR operation.
+3. Convert the result back to decimal.
+
+### Step 1: Convert to Binary
+
+- **$s0 = 29** in binary is `0000000000011101`.
+- **Immediate Value (14652)** in binary is `0011100100110100`.
+
+### Step 2: Perform Bitwise OR
+
+Bitwise OR operation will set a bit to `1` if either of the bits in the same position of the operands is `1`.
+
+sql
+
+    `$s0:        0000000000011101     Immediate:  0011100100110100                 ----------------     Result:     0011100100111101`
+
+### Step 3: Convert Result Back to Decimal
+
+The resulting binary number `0011100100111101` converted back to decimal gives us the value of `$v0` after the execution of the instruction.
+
+Let's calculate the decimal value of the result:
+
+The integer value of the `$v0` register after executing the instruction `ori $v0, $s0, 14652`, given `$s0 = 29`, is `14653`.
+
+----
+The `srl` (Shift Right Logical) instruction shifts the bits of the source register (`$at` in this case) to the right by a specified number of positions (11 in this example) and places the result in the destination register (`$v0` here). Logical right shifts insert zeros into the most significant bit (leftmost) as the value is shifted.
+
+Given:
+
+- **$at = 125**
+- **Shift Amount = 11**
+
+### Step 1: Convert $at to Binary
+
+First, convert the decimal value `125` to binary:
+
+- **$at (125)** in binary is `00000000000000000000000001111101`.
+
+### Step 2: Perform the Shift Right Logical by 11
+
+Shifting this binary value right by 11 positions means dropping the rightmost 11 bits and padding the left side with zeros:
+
+- Before Shift: `00000000000000000000000001111101`
+- After Shift: `00000000000000000000000000000000`
+
+Since shifting `125` right by 11 places results in all bits being shifted out (because `125` is a relatively small number and we're shifting by a large amount), the binary result is `0`.
+
+### Step 3: Convert Result Back to Decimal
+
+The resulting binary number is `0`, so the decimal value of `$v0` after executing `srl $v0, $at, 11` with `$at = 125` is **0**.
+
+---
+
+
+
+
+
