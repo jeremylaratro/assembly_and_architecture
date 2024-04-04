@@ -7,6 +7,7 @@
 
 # Example given values:
 # sltu $t3, $fp, $a1
+# CHANGE values for problem
 rs_value = 30  # $fp
 rt_value = 5   # $a1
 rd_value = 11  # $t3
