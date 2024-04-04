@@ -1,0 +1,29 @@
+#### Stack Push
+- Putting values ON the stack. Using FIFO data structure, thus can place onto the top of the stack.
+- $sp register - ptr to memory address, FIFO
+- Steps:
+	- Reserve space on the stack by decrementing x (needed) bytes
+		- store values on the stack using store word procedure ``sw`` into a register (i.e. ``$a#``) using the stack pointer ``$sp``
+
+ 2 ints = 4 bytes x 2 = 8 bytes needed, split accordingly (0 - 3, 4 - 7)
+```
+addiu $sp, $sp, -8 # -> reserve the top 8 bytes on stack
+```
+ Now, to actually store the 2 integers (in $a0 and $a1), use store word procedure
+```
+sw $a0, 0($sp) # store integer 1 @ bytes 0-3 , above stack ptr
+sw $a1, 4($sp) # store integer 2 @ bytes 4-7, above stack ptr
+```
+#### Stack Pop
+- Reverse of stack push 
+- Steps:
+	- Copy value from stack into register, i.e. ``$a#`` 
+	- de-allocate the x bytes used on the stack using load word procedure ``lw`` 
+Ex: Retrieve the 2 ints off the stack
+```
+lw $a0, 0($sp) # load the first int @ bytes 0 - 3
+lw $a1, 4($sp) # load the second int @ bytes 4 - 7
+```
+Then, de-allocate the space
+```
+addiu $sp, $sp, 8 # de-allocate the 8 bytes on the stack ptr
