@@ -1,0 +1,51 @@
+**Question:**
+- Given an 8-word, 2-way set associative cache, and the sequence of address accesses below, enter the number of misses.  
+```
+5  
+19  
+19  
+24  
+24  
+24
+```
+
+**Answer**: 
+**SIMPLE BREAKDOWN**: 
+- Calculate the set by doing `{acess #} mod {# of sets}`
+- See how many have not been accessed before --> miss
+- `5 mod 4 = 1` --> set initially empty --> miss
+
+**Full Breakdown:**
+- To calculate the number of cache misses for an 8-word, 2-way set associative cache with the given sequence of address accesses, we need to understand how this type of cache organizes data and how it handles accesses. Here's the approach:
+### Understanding the Cache Configuration:
+
+- **8-Word Cache:** This implies there are 8 slots in the cache for storing words.
+- **2-Way Set Associative:** This means the cache is divided into sets, each containing 2 slots (ways). Thus, our cache has 4 sets in total (8 words / 2 ways per set).
+### Cache Access Sequence:
+
+The sequence of address accesses is: `5, 19, 19, 24, 24, 24`.
+
+### Determining Set Placement:
+
+To determine which set an address maps to, we typically use the formula: 
+
+`Set number=(Address)mod(Number of sets)`
+
+Given we have 4 sets, we calculate the set number for each access:
+
+- For address `5`: `5 mod 4 = 1`
+- For address `19`: `19 mod 4 = 3`
+- For address `24`: `24 mod 4 = 0`
+
+### Step-by-Step Access Analysis:
+
+1. **Access to `5`** maps to set `1`. It's a **miss** since the set is initially empty.
+2. **Access to `19`** maps to set `3`. It's a **miss** for the same reason as above.
+3. **Access to `19`** again maps to set `3`. It's a **hit** because `19` was just loaded into set `3`.
+4. **Access to `24`** maps to set `0`. It's a **miss** because set `0` is empty at this point.
+5. **Access to `24`** again maps to set `0`. It's a **hit**, as `24` is already in set `0`.
+6. **Access to `24`** a third time is still a **hit**.
+
+### Calculating Misses:
+
+- From the step-by-step analysis, we have **3 misses** in total (the first access to `5`, `19`, and `24`).
