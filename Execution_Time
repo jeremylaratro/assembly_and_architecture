@@ -1,0 +1,48 @@
+##### Calculating execution time of a binary/program
+- Components:
+	- Cycles per Instruction (CPI)
+	- Instruction Count (IC)
+	- Clock Rate [frequency] (F)
+	- Clock Period (T)
+##### General Formula:
+```
+E = IC*CPI*T
+
+Or
+
+E = IC*CPI/F
+```
+- if non-uniform cycles per instruction:
+	- calculate average CPI 
+```
+CPI`= ((IC(n)/IC)*CPI(n))+((IC(n+1)/IC)*CPI(n+1))+((IC(n+2)/IC)*CPI(n+2))...
+```
+```
+Execution Time = (IC(n)*CPI(n))+(IC(n)*CPI(n)...) / Frequency
+```
+
+IMPORTANT
+- If given microseconds:
+	- must perform calculation as frequency --> ``1/(#us * 10^6)``
+
+
+---
+> Example:
+IC(1)=9 | CPI(1)=8
+IC(2)=5 | CPI(2)=3
+IC(3)=8 | CPI(3)=9
+Clock period = 8us
+
+1. Conversion from microseconds to megahertz:
+```
+8us --> 0.125Mhz --> 0.125 * 10^6 OR SIMPLY 1/8*10^6
+```
+2. Equation:
+```
+((9*8)+(5*3)+(8*9))/(0.125*10^(6)) = 1.272 * 10^-3
+```
+3. Conversion back to microseconds
+```
+1.272 * 10^-3 --> 1272 * 10^-6 --> 1272us
+```
+Binary execution time of 1272us
